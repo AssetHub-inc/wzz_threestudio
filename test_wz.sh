@@ -8,3 +8,6 @@ CUDA_VISIBLE_DEVICES=1 python launch.py --config configs/zero123.yaml --train da
 CUDA_VISIBLE_DEVICES=1 python launch.py --config configs/prolificdreamer-patch.yaml --train system.prompt_processor.prompt="a high-resolution DSLR image of Luffy medal"
 CUDA_VISIBLE_DEVICES=1 python launch.py --config configs/prolificdreamer-patch.yaml --train system.prompt_processor.prompt="a high-resolution DSLR image of gold circular Luffy medal"
 CUDA_VISIBLE_DEVICES=1 python launch.py --config configs/prolificdreamer-patch.yaml --train system.prompt_processor.prompt="a high-resolution DSLR image of gold flat thin Luffy medal"
+
+#magic123 with VSD
+CUDA_VISIBLE_DEVICES=1 python launch.py --config configs/magic123-coarse-sd_VSD.yaml --train data.image_path=load/images/luffy_medal_rgba.png system.prompt_processor.prompt="a high-resolution DSLR image of Luffy medal" 

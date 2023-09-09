@@ -90,6 +90,7 @@ class Magic123(BaseLift3DSystem):
             loss += loss_depth * self.C(self.cfg.loss.lambda_depth)
 
         # relative depth loss
+        # pdb.set_trace()
         if self.C(self.cfg.loss.lambda_depth_rel) > 0:
             valid_gt_depth = batch["ref_depth"][gt_mask.squeeze(-1)]  # [B,]
             valid_pred_depth = out["depth"][gt_mask]  # [B,]
@@ -106,6 +107,9 @@ class Magic123(BaseLift3DSystem):
             valid_pred_normal = (
                 2 * out["comp_normal"][gt_mask.squeeze(-1)] - 1
             )  # [B, 3]
+            # valid_pred_normal = (
+            #     1 - 2 * out["comp_normal"][gt_mask.squeeze(-1)]
+            # )  # [B, 3]
             loss_normal = (1 - F.cosine_similarity(valid_pred_normal, valid_gt_normal).mean())
             self.log("train/loss_normal", loss_normal)
             loss += loss_normal * self.C(self.cfg.loss.lambda_normal)
