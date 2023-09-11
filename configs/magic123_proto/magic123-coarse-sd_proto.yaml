@@ -96,7 +96,11 @@ system:
   prompt_processor_type: "stable-diffusion-prompt-processor"
   prompt_processor:
     pretrained_model_name_or_path: "stabilityai/stable-diffusion-2-1-base"
-    prompt: ???
+    prompt: "a high-resolution DSLR image of Luffy medal"
+    prompt_back: "back side of coin, without any icon, flat no illustration, simple texturess"
+    prompt_side: "side of coin, straight, flat, thin"
+
+
 
   guidance_type: "stable-diffusion-unified-guidance"
   guidance:

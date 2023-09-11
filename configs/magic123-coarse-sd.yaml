@@ -114,7 +114,7 @@ system:
     lambda_mask: 100.
     lambda_sd: 0.025
     lambda_3d_sd: 1.
-    lambda_orient: 0.
+    lambda_orient: 2
     lambda_normal_smoothness_2d: 1000.
     lambda_sparsity: 0.
     lambda_opaque: 0.
