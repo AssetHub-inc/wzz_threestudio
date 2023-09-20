@@ -21,3 +21,4 @@ CUDA_VISIBLE_DEVICES=1 python launch.py --config configs/magic123-refine-sd.yaml
 
 
 python launch.py --config configs/magic123_proto/magic123-coarse-sd_proto.yaml --train --gpu 0,1 data.image_path=load/images/luffy_deepnormal_rgba.png
+python launch.py --config configs/magic123_proto/magic123-coarse-sd_proto.yaml --train --gpu 0,1 data.image_path=load/images/luffy_edited_rgba.png

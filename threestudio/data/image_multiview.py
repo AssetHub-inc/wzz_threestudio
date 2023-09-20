@@ -27,33 +27,22 @@ from threestudio.utils.ops import (
     get_rays,
 )
 from threestudio.utils.typing import *
-
+from threestudio.data.image import SingleImageDataModuleConfig, SingleImageDataBase
 
 @dataclass
-class SingleImageDataModuleConfig:
-    # height and width should be Union[int, List[int]]
-    # but OmegaConf does not support Union of containers
-    height: Any = 96
-    width: Any = 96
-    resolution_milestones: List[int] = field(default_factory=lambda: [])
-    default_elevation_deg: float = 0.0
-    default_azimuth_deg: float = -180.0
-    default_camera_distance: float = 1.2
-    default_fovy_deg: float = 60.0
-    image_path: str = ""
-    use_random_camera: bool = True
-    random_camera: dict = field(default_factory=dict)
-    rays_noise_scale: float = 2e-3
-    batch_size: int = 1
-    requires_depth: bool = False
-    requires_normal: bool = False
+class MultiImageDataModuleConfig(SingleImageDataModuleConfig):
+    default_elevation_deg: List[float] = field(default_factory=lambda: [])
+    default_azimuth_deg: List[float] = field(default_factory=lambda: [])
+    default_camera_distance: List[float] = field(default_factory=lambda: [])
+    default_fovy_deg: List[float] = field(default_factory=lambda: [])
+    image_path: List[str] = field(default_factory=lambda: [])
 
 
-class SingleImageDataBase:
+class MultiImageDataBase(SingleImageDataBase):
     def setup(self, cfg, split):
         self.split = split
         self.rank = get_rank()
-        self.cfg: SingleImageDataModuleConfig = cfg
+        self.cfg: MultiImageDataModuleConfig = cfg
 
         if self.cfg.use_random_camera:
             random_camera_cfg = parse_structured(
@@ -73,9 +62,7 @@ class SingleImageDataBase:
         camera_distance = torch.FloatTensor([self.cfg.default_camera_distance])
 
         elevation = elevation_deg * math.pi / 180
-        # tensor([0.])
         azimuth = azimuth_deg * math.pi / 180
-        # tensor([0.])
         camera_position: Float[Tensor, "1 3"] = torch.stack(
             [
                 camera_distance * torch.cos(elevation) * torch.cos(azimuth),
@@ -84,25 +71,18 @@ class SingleImageDataBase:
             ],
             dim=-1,
         )
-        # tensor([[2.5000, 0.0000, 0.0000]])
+
         center: Float[Tensor, "1 3"] = torch.zeros_like(camera_position)
-        # tensor([[0., 0., 0.]])
-        pdb.set_trace()
         up: Float[Tensor, "1 3"] = torch.as_tensor([0, 0, 1], dtype=torch.float32)[None]
-        # tensor([[0., 0., 1.]])
+
         light_position: Float[Tensor, "1 3"] = camera_position
-        # tensor([[2.5000, 0.0000, 0.0000]])
         lookat: Float[Tensor, "1 3"] = F.normalize(center - camera_position, dim=-1)
-        # tensor([[-1.,  0.,  0.]])
-        right: Float[Tensor, "1 3"] = F.normalize(torch.cross(lookat, up), dim=-1) # calculate cross product
-        # tensor([[0., 1., -0.]])
+        right: Float[Tensor, "1 3"] = F.normalize(torch.cross(lookat, up), dim=-1)
         up = F.normalize(torch.cross(right, lookat), dim=-1)
-        # tensor([[0., 0., 1.]])
         self.c2w: Float[Tensor, "1 3 4"] = torch.cat(
             [torch.stack([right, up, -lookat], dim=-1), camera_position[:, :, None]],
             dim=-1,
         )
-        
 
         self.camera_position = camera_position
         self.light_position = light_position
@@ -289,7 +269,7 @@ class SingleImageDataBase:
         self.load_images()
 
 
-class SingleImageIterableDataset(IterableDataset, SingleImageDataBase, Updateable):
+class MultiImageIterableDataset(IterableDataset, MultiImageDataBase, Updateable):
     def __init__(self, cfg: Any, split: str) -> None:
         super().__init__()
         self.setup(cfg, split)
@@ -325,7 +305,7 @@ class SingleImageIterableDataset(IterableDataset, SingleImageDataBase, Updateabl
             yield {}
 
 
-class SingleImageDataset(Dataset, SingleImageDataBase):
+class MultiImageDataset(Dataset, MultiImageDataBase):
     def __init__(self, cfg: Any, split: str) -> None:
         super().__init__()
         self.setup(cfg, split)
@@ -353,21 +333,21 @@ class SingleImageDataset(Dataset, SingleImageDataBase):
         #     return self.random_pose_generator[index - 1]
 
 
-@register("single-image-datamodule")
-class SingleImageDataModule(pl.LightningDataModule):
-    cfg: SingleImageDataModuleConfig
+@register("multi-image-datamodule")
+class MultiImageDataModule(pl.LightningDataModule):
+    cfg: MultiImageDataModuleConfig
 
     def __init__(self, cfg: Optional[Union[dict, DictConfig]] = None) -> None:
         super().__init__()
-        self.cfg = parse_structured(SingleImageDataModuleConfig, cfg)
+        self.cfg = parse_structured(MultiImageDataModuleConfig, cfg)
 
     def setup(self, stage=None) -> None:
         if stage in [None, "fit"]:
-            self.train_dataset = SingleImageIterableDataset(self.cfg, "train")
+            self.train_dataset = MultiImageIterableDataset(self.cfg, "train")
         if stage in [None, "fit", "validate"]:
-            self.val_dataset = SingleImageDataset(self.cfg, "val")
+            self.val_dataset = MultiImageDataset(self.cfg, "val")
         if stage in [None, "test", "predict"]:
-            self.test_dataset = SingleImageDataset(self.cfg, "test")
+            self.test_dataset = MultiImageDataset(self.cfg, "test")
 
     def prepare_data(self):
         pass

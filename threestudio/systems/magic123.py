@@ -46,6 +46,7 @@ class Magic123(BaseLift3DSystem):
         out = self(batch["random_camera"])
         gt_mask = batch["mask"]
         prompt_utils = self.prompt_processor()
+        # pdb.set_trace()
         guidance_out = self.guidance(
             out["comp_rgb"],
             prompt_utils,
