@@ -87,7 +87,7 @@ class SingleImageDataBase:
         # tensor([[2.5000, 0.0000, 0.0000]])
         center: Float[Tensor, "1 3"] = torch.zeros_like(camera_position)
         # tensor([[0., 0., 0.]])
-        pdb.set_trace()
+        # pdb.set_trace()
         up: Float[Tensor, "1 3"] = torch.as_tensor([0, 0, 1], dtype=torch.float32)[None]
         # tensor([[0., 0., 1.]])
         light_position: Float[Tensor, "1 3"] = camera_position

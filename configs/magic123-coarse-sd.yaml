@@ -118,9 +118,9 @@ system:
     lambda_normal_smoothness_2d: 1000.
     lambda_sparsity: 0.
     lambda_opaque: 0.
-    lambda_depth: 0.
-    lambda_depth_rel: 0.2
-    lambda_normal: 0.
+    lambda_depth: 0.5
+    lambda_depth_rel: 0.5
+    lambda_normal: 0.5
 
   optimizer:
     name: Adam
