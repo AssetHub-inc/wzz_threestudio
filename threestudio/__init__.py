@@ -1,3 +1,4 @@
+import pdb
 __modules__ = {}
 
 
@@ -10,6 +11,7 @@ def register(name):
 
 
 def find(name):
+    # pdb.set_trace()
     return __modules__[name]
 
 

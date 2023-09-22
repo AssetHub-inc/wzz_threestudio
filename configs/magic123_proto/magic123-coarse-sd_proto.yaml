@@ -83,6 +83,8 @@ system:
 
   guidance_3d_type: "zero123-unified-guidance"
   guidance_3d:
+    # pretrained_model_name_or_path: "bennyguo/zero123-diffusers"
+    pretrained_model_name_or_path: "bennyguo/zero123-xl-diffusers"
     guidance_type: "sds"
     guidance_scale: 5.0
     min_step_percent: 0.2
@@ -96,7 +98,11 @@ system:
   prompt_processor_type: "stable-diffusion-prompt-processor"
   prompt_processor:
     pretrained_model_name_or_path: "stabilityai/stable-diffusion-2-1-base"
-    prompt: ???
+    prompt: "a high-resolution DSLR image of Luffy medal"
+    prompt_back: "back side of coin, without any icon, flat no illustration, simple texturess"
+    prompt_side: "side of coin, straight, flat, thin, not diagonal, completely upright"
+
+
 
   guidance_type: "stable-diffusion-unified-guidance"
   guidance:
@@ -130,9 +136,13 @@ system:
     lambda_normal_smoothness_2d: 1000.
     lambda_sparsity: 0.
     lambda_opaque: 0.
-    lambda_depth: 0.
-    lambda_depth_rel: 0.2
-    lambda_normal: 0.
+    lambda_depth: 0.5
+    lambda_depth_rel: 0.5
+    lambda_normal: 0.5
+
+    # lambda_depth: 20
+    # lambda_depth_rel: 20
+    # lambda_normal: 20
 
   optimizer:
     name: Adam

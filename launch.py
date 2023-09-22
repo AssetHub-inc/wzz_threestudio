@@ -3,7 +3,7 @@ import contextlib
 import logging
 import os
 import sys
-
+import pdb
 
 class ColoredFilter(logging.Filter):
     """
@@ -96,6 +96,7 @@ def main(args, extras) -> None:
 
     # parse YAML config to OmegaConf
     cfg: ExperimentConfig
+    # pdb.set_trace()
     cfg = load_config(args.config, cli_args=extras, n_gpus=n_gpus)
 
     # set a different seed for each device
@@ -176,6 +177,51 @@ def main(args, extras) -> None:
         ckpt = torch.load(ckpt_path, map_location="cpu")
         system.set_resume_status(ckpt["epoch"], ckpt["global_step"])
 
+    # pdb.set_trace()
+    # args = Namespace(config='configs/magic123-coarse-sd.yaml', gpu='0', train=True, validate=False, test=False, export=False, gradio=False, verbose=False, typecheck=False)
+    # extras = ['data.image_path=load/images/luffy_medal_rgba.png', 'system.prompt_processor.prompt=a high-resolution DSLR image of Luffy medal']
+    # cfg = {'name': 'magic123-coarse-sd', 'description': '', 
+    # 'tag': 'luffy_medal_rgba.png-a_high-resolution_DSLR_image_of_Luffy_medal', 'seed': 0, 'use_timestamp': True, 
+    # 'timestamp': '@20230916-065506', 'exp_root_dir': 'outputs', 'exp_dir': 'outputs/magic123-coarse-sd', 
+    # 'trial_name': 'luffy_medal_rgba.png-a_high-resolution_DSLR_image_of_Luffy_medal@20230916-065506', 
+    # 'trial_dir': 'outputs/magic123-coarse-sd/luffy_medal_rgba.png-a_high-resolution_DSLR_image_of_Luffy_medal@20230916-065506', 
+    # 'n_gpus': 1, 'resume': None, 'data_type': 'single-image-datamodule', 
+    # 'data': {'image_path': 'load/images/luffy_medal_rgba.png', 'height': 128, 'width': 128, 
+    # 'default_elevation_deg': 0.0, 'default_azimuth_deg': 0.0, 'default_camera_distance': 2.5, 
+    # 'default_fovy_deg': 40.0, 'requires_depth': True, 'requires_normal': False, 
+    # 'random_camera': {'batch_size': 1, 'height': 128, 'width': 128, 'elevation_range': [-45, 45], 
+    # 'azimuth_range': [-180, 180], 'camera_distance_range': [2.5, 2.5], 'fovy_range': [40.0, 40.0], 
+    # 'camera_perturb': 0.0, 'center_perturb': 0.0, 'up_perturb': 0.0, 'eval_height': 512, 'eval_width': 512, 
+    # 'eval_elevation_deg': 0.0, 'eval_camera_distance': 2.5, 'eval_fovy_deg': 40.0, 'n_val_views': 4, 
+    # 'n_test_views': 120}}, 'system_type': 'magic123-system', 'system': {'geometry_type': 'implicit-volume', 
+    # 'geometry': {'radius': 1.0, 'normal_type': 'analytic', 'density_bias': 'blob_magic3d', 
+    # 'density_activation': 'softplus', 'density_blob_scale': 10.0, 'density_blob_std': 0.5, 
+    # 'pos_encoding_config': {'otype': 'ProgressiveBandHashGrid', 'n_levels': 16, 'n_features_per_level': 2, 
+    # 'log2_hashmap_size': 19, 'base_resolution': 16, 'per_level_scale': 1.447269237440378, 'start_level': 8, 
+    # 'start_step': 2000, 'update_steps': 300}, 
+    # 'mlp_network_config': {'otype': 'VanillaMLP', 'activation': 'ReLU', 'output_activation': 'none', 'n_neurons': 64, 
+    # 'n_hidden_layers': 3}}, 'material_type': 'no-material', 'material': {'requires_normal': True}, 
+    # 'background_type': 'solid-color-background', 'renderer_type': 'nerf-volume-renderer', 
+    # 'renderer': {'radius': 1.0, 'estimator': 'occgrid', 'num_samples_per_ray': 256, 'return_comp_normal': True}, 
+    # 'guidance_3d_type': 'zero123-unified-guidance', 'guidance_3d': {'guidance_type': 'sds', 'guidance_scale': 5.0, 
+    # 'min_step_percent': 0.2, 'max_step_percent': 0.6, 'cond_image_path': 'load/images/luffy_medal_rgba.png', 
+    # 'cond_elevation_deg': 0.0, 'cond_azimuth_deg': 0.0, 'cond_camera_distance': 2.5}, 
+    # 'prompt_processor_type': 'stable-diffusion-prompt-processor', 
+    # 'prompt_processor': {'pretrained_model_name_or_path': 'runwayml/stable-diffusion-v1-5', 
+    # 'prompt': 'a high-resolution DSLR image of Luffy medal'}, 
+    # 'guidance_type': 'stable-diffusion-unified-guidance', 
+    # 'guidance': {'guidance_type': 'sds', 'pretrained_model_name_or_path': 'runwayml/stable-diffusion-v1-5', 
+    # 'guidance_scale': 100.0, 'min_step_percent': 0.2, 'max_step_percent': 0.6}, 
+    # 'loggers': {'wandb': {'enable': False, 'project': 'threestudio', 'name': 'None'}}, 
+    # 'loss': {'lambda_rgb': 1000.0, 'lambda_mask': 100.0, 'lambda_sd': 0.025, 'lambda_3d_sd': 1.0, 
+    # 'lambda_orient': 2, 'lambda_normal_smoothness_2d': 1000.0, 'lambda_sparsity': 0.0, 'lambda_opaque': 0.0, 
+    # 'lambda_depth': 0.0, 'lambda_depth_rel': 0.2, 'lambda_normal': 0.0}, 
+    # 'optimizer': {'name': 'Adam', 'args': {'lr': 0.01, 'betas': [0.9, 0.99], 'eps': 1e-08}, 
+    # 'params': {'geometry.encoding': {'lr': 0.01}, 'geometry.density_network': {'lr': 0.001}, 
+    # 'geometry.feature_network': {'lr': 0.001}}}}, 
+    # 'trainer': {'max_steps': 5000, 'log_every_n_steps': 1, 'num_sanity_val_steps': 0, 'val_check_interval': 100, 
+    # 'enable_progress_bar': True, 'precision': 32}, 'checkpoint': {'save_last': True, 'save_top_k': -1, 
+    # 'every_n_train_steps': 5000}}
     if args.train:
         trainer.fit(system, datamodule=dm, ckpt_path=cfg.resume)
         trainer.test(system, datamodule=dm)
@@ -228,7 +274,7 @@ if __name__ == "__main__":
     )
 
     args, extras = parser.parse_known_args()
-
+    # pdb.set_trace()
     if args.gradio:
         # FIXME: no effect, stdout is not captured
         with contextlib.redirect_stdout(sys.stderr):

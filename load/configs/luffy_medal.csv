@@ -1,0 +1,3 @@
+zero123_weight, elevation, azimuth, camera_distance, fovy_deg, image
+1, 2.5, 0, 0, 40, images/luffy_medal_front_rgba.png
+1, 2.5, 0, 180, 40, images/luffy_medal_back_rgba.png

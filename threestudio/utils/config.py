@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from omegaconf import OmegaConf
-
+import pdb
 import threestudio
 from threestudio.utils.typing import *
 
@@ -103,6 +103,7 @@ def load_config(*yamls: str, cli_args: list = [], from_string=False, **kwargs) -
         yaml_confs = [OmegaConf.load(f) for f in yamls]
     cli_conf = OmegaConf.from_cli(cli_args)
     cfg = OmegaConf.merge(*yaml_confs, cli_conf, kwargs)
+    # pdb.set_trace()
     OmegaConf.resolve(cfg)
     assert isinstance(cfg, DictConfig)
     scfg = parse_structured(ExperimentConfig, cfg)

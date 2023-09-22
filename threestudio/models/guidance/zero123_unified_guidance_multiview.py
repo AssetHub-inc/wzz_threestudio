@@ -29,8 +29,8 @@ from threestudio.utils.misc import C, cleanup, enable_gradient, parse_version
 from threestudio.utils.typing import *
 import pdb
 
-@threestudio.register("zero123-unified-guidance")
-class Zero123UnifiedGuidance(BaseModule):
+@threestudio.register("zero123-unified-guidance-multiview")
+class Zero123UnifiedGuidanceMultiView(BaseModule):
     @dataclass
     class Config(BaseModule.Config):
         # guidance type, in ["sds", "vsd"]
@@ -48,10 +48,10 @@ class Zero123UnifiedGuidance(BaseModule):
         return_rgb_multistep_orig: bool = False
         n_rgb_multistep_orig_steps: int = 4
 
-        cond_image_path: str = ""
-        cond_elevation_deg: float = 0.0
-        cond_azimuth_deg: float = 0.0
-        cond_camera_distance: float = 1.2
+        cond_image_path: List[str] = field(default_factory=lambda: [])
+        cond_elevation_deg: List[float] = field(default_factory=lambda: [])
+        cond_azimuth_deg: List[float] = field(default_factory=lambda: [])
+        cond_camera_distance: List[float] = field(default_factory=lambda: [])
 
         # efficiency-related configurations
         half_precision_weights: bool = True
@@ -219,37 +219,38 @@ class Zero123UnifiedGuidance(BaseModule):
         pipe.set_progress_bar_config(disable=True)
 
     def prepare_image_embeddings(self) -> None:
-        # pdb.set_trace()
-        if not os.path.exists(self.cfg.cond_image_path): #'load/images/luffy_medal_rgba.png'
-            raise RuntimeError(
-                f"Condition image not found at {self.cfg.cond_image_path}"
+        pdb.set_trace()
+        images = []
+        for image_path in self.cfg.cond_image_path:
+            if not os.path.exists(image_path):
+                raise RuntimeError(
+                    f"Condition image not found at {image_path}"
+                )
+            image = Image.open(image_path).convert("RGBA").resize((256, 256))
+            image = (
+                TF.to_tensor(image)
+                .unsqueeze(0)
+                .to(device=self.device, dtype=self.weights_dtype)
             )
-        image = Image.open(self.cfg.cond_image_path).convert("RGBA").resize((256, 256))
-        # (256, 256)
-        image = (
-            TF.to_tensor(image)
-            .unsqueeze(0)
-            .to(device=self.device, dtype=self.weights_dtype)
-        )
-        # torch.Size([1, 4, 256, 256])
-
-        # rgba -> rgb, apply white background
-        image = image[:, :3] * image[:, 3:4] + (1 - image[:, 3:4])
-        # torch.Size([1, 3, 256, 256])
-
+            # rgba -> rgb, apply white background
+            image = image[:, :3] * image[:, 3:4] + (1 - image[:, 3:4])
+            images.append(image)
+        images = torch.cat(images, dim=0)
+        # torch.Size([2, 3, 256, 256])
+        
         with torch.no_grad():
             self.clip_image_embeddings: Float[
-                Tensor, "1 1 D"
-            ] = self.extract_clip_image_embeddings(image)
-            # torch.Size([1, 768])
+                Tensor, "V 1 D"
+            ] = self.extract_clip_image_embeddings(images)
+            # torch.Size([2, 768])
 
             # encoded latents should be multiplied with vae.config.scaling_factor
             # but zero123 was not trained this way
-            self.image_latents: Float[Tensor, "1 4 Hl Wl"] = (
-                self.vae_encode(self.pipe.vae, image * 2.0 - 1.0, mode=True)
+            self.image_latents: Float[Tensor, "V 4 Hl Wl"] = (
+                self.vae_encode(self.pipe.vae, images * 2.0 - 1.0, mode=True)
                 / self.pipe.vae.config.scaling_factor
             )
-            # torch.Size([1, 4, 32, 32])
+            # torch.Size([2, 4, 32, 32])
 
     def extract_clip_image_embeddings(
         self, images: Float[Tensor, "B 3 H W"]

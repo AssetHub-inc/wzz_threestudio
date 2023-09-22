@@ -12,6 +12,7 @@ import threestudio
 from threestudio.systems.base import BaseLift3DSystem
 from threestudio.utils.ops import binary_cross_entropy, dot
 from threestudio.utils.typing import *
+import pdb
 
 
 @threestudio.register("zero123-system")
@@ -90,6 +91,7 @@ class Zero123(BaseLift3DSystem):
         if guidance == "ref":
             gt_mask = batch["mask"]
             gt_rgb = batch["rgb"]
+            # pdb.set_trace()
 
             # color loss
             gt_rgb = gt_rgb * gt_mask.float() + out["comp_rgb_bg"] * (
@@ -133,6 +135,8 @@ class Zero123(BaseLift3DSystem):
                     1 - F.cosine_similarity(valid_pred_normal, valid_gt_normal).mean(),
                 )
         elif guidance == "zero123":
+            # pdb.set_trace()
+
             # zero123
             guidance_out = self.guidance(
                 out["comp_rgb"],
@@ -232,6 +236,8 @@ class Zero123(BaseLift3DSystem):
             do_zero123 = not do_ref
 
         total_loss = 0.0
+        # pdb.set_trace()
+
         if do_zero123:
             out = self.training_substep(batch, batch_idx, guidance="zero123")
             total_loss += out["loss"]

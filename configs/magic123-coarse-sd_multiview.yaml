@@ -1,17 +1,18 @@
 name: "magic123-coarse-sd"
-tag: "${rmspace:${basename:${data.image_path}},_}-${rmspace:${system.prompt_processor.prompt},_}"
+tag: "${rmspace:${basename:${data.image_path[0]}},_}-${rmspace:${system.prompt_processor.prompt},_}"
+# only data.image_path[0]: first image name in directory name
 exp_root_dir: "outputs"
 seed: 0
 
-data_type: "single-image-datamodule"
+data_type: "multi-image-datamodule"
 data:
-  image_path: ???
+  image_path: ["load/images/luffy_medal_front_rgba.png", "load/images/luffy_medal_back_rgba.png"]
   height: 128
   width: 128
-  default_elevation_deg: 0.0
-  default_azimuth_deg: 0.0
-  default_camera_distance: 2.5
-  default_fovy_deg: 40.0
+  default_elevation_deg: [0.0, 0.0]
+  default_azimuth_deg: [0.0, 180.0]
+  default_camera_distance: [2.5, 2.5]
+  default_fovy_deg: [40.0, 40.0]
   requires_depth: ${cmaxgt0orcmaxgt0:${system.loss.lambda_depth},${system.loss.lambda_depth_rel}}
   requires_normal: ${cmaxgt0:${system.loss.lambda_normal}}
   random_camera:
@@ -78,7 +79,7 @@ system:
     num_samples_per_ray: 256
     return_comp_normal: true
 
-  guidance_3d_type: "zero123-unified-guidance"
+  guidance_3d_type: "zero123-unified-guidance-multiview"
   guidance_3d:
     guidance_type: "sds"
     guidance_scale: 5.0
@@ -118,9 +119,9 @@ system:
     lambda_normal_smoothness_2d: 1000.
     lambda_sparsity: 0.
     lambda_opaque: 0.
-    lambda_depth: 0.5
-    lambda_depth_rel: 0.5
-    lambda_normal: 0.5
+    lambda_depth: 0.
+    lambda_depth_rel: 0.2
+    lambda_normal: 0.
 
   optimizer:
     name: Adam
