@@ -104,9 +104,9 @@ system:
     lambda_3d_sd: 1.
     lambda_normal_consistency: 1000.
     lambda_laplacian_smoothness: 0.
-    lambda_depth: 0.
-    lambda_depth_rel: 0.
-    lambda_normal: 0.
+    lambda_depth: 0.5
+    lambda_depth_rel: 0.5
+    lambda_normal: 0.5
 
   optimizer:
     name: Adam
